@@ -7,7 +7,7 @@
 # More info about color codes in https://en.wikipedia.org/wiki/ANSI_escape_code
 
 
-PROMPT_CHAR=${POWERLINE_PROMPT_CHAR:=""}
+PROMPT_CHAR=${POWERLINE_PROMPT_CHAR:="\n"}
 POWERLINE_LEFT_SEPARATOR=" "
 POWERLINE_PROMPT="last_status user_info cwd scm"
 
@@ -20,14 +20,14 @@ SCM_PROMPT_DIRTY="*"
 SCM_PROMPT_AHEAD="↑"
 SCM_PROMPT_BEHIND="↓"
 SCM_PROMPT_CLEAN_COLOR="G Bl"
-SCM_PROMPT_DIRTY_COLOR="R Bl"
+SCM_PROMPT_DIRTY_COLOR="Y Bl"
 SCM_PROMPT_AHEAD_COLOR=""
 SCM_PROMPT_BEHIND_COLOR=""
 SCM_PROMPT_STAGED_COLOR="Y Bl"
-SCM_PROMPT_UNSTAGED_COLOR="R Bl"
+SCM_PROMPT_UNSTAGED_COLOR="Y Bl"
 SCM_PROMPT_COLOR=${SCM_PROMPT_CLEAN_COLOR}
 
-CWD_PROMPT_COLOR="B C"
+CWD_PROMPT_COLOR="B W"
 
 STATUS_PROMPT_COLOR="Bl R B"
 STATUS_PROMPT_ERROR="✘"
@@ -195,9 +195,12 @@ function __powerline_left_segment {
 
 function __powerline_last_status_prompt {
   local symbols=()
+  local stopped__jobs
+  read -N1 stopped__jobs < <(jobs -sp)
   [[ $last_status -ne 0 ]] && symbols+="$(__color ${STATUS_PROMPT_ERROR_COLOR})${STATUS_PROMPT_ERROR}"
   [[ $UID -eq 0 ]] && symbols+="$(__color ${STATUS_PROMPT_ROOT_COLOR})${STATUS_PROMPT_ROOT}"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="$(__color ${STATUS_PROMPT_JOBS_COLOR})${STATUS_PROMPT_JOBS}"
+  # [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="$(__color ${STATUS_PROMPT_JOBS_COLOR})${STATUS_PROMPT_JOBS}"
+  [[ ! -z "$stopped__jobs" ]] && symbols+="$(__color ${STATUS_PROMPT_JOBS_COLOR})${STATUS_PROMPT_JOBS}"
 
   [[ -n "$symbols" ]] && echo "$symbols|${STATUS_PROMPT_COLOR}"
 }
